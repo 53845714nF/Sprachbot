@@ -1,0 +1,10 @@
+Flask
+flask-sqlalchemy
+flask_cors
+pyodbc
+pandas
+plotly
+reportlab
+Flask-WTF
+azure-identity 
+azure-keyvault-secrets
