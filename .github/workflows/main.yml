@@ -1,5 +1,4 @@
-name: Create Docker Image for Malware DNA
-
+name: Create Docker Image for Sprachbot API
 on:
   push:
   workflow_dispatch:
