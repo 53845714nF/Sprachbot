@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from .custom_prompt_bot import CustomPromptBot
+from .user_bot import UserPromptBot
 
-__all__ = ["CustomPromptBot"]
+__all__ = ["UserPromptBot"]
