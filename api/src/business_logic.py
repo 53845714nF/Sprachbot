@@ -6,10 +6,11 @@ from data_access import (
     get_user,
     get_all_users,
     update_user,
-    delete_user
+    delete_user,
+    search_user
 )
 
-def create_new_user(data):
+def bl_create_user(data):
     geburtsdatum = None
     if data.get('geburtsdatum'):
         try:
@@ -30,13 +31,13 @@ def create_new_user(data):
         land=data.get('land')
     )
 
-def get_user_details(person_id):
+def bl_get_user(person_id):
     return get_user(person_id)
 
-def get_all_user_details():
+def bl_get_all_users():
     return get_all_users()
 
-def update_existing_user(person_id, data):
+def bl_update_user(person_id, data):
     geburtsdatum = None
     if data.get('geburtsdatum'):
         try:
@@ -58,5 +59,12 @@ def update_existing_user(person_id, data):
         land=data.get('land')
     )
 
-def delete_existing_user(person_id):
+def bl_delete_user(person_id):
     return delete_user(person_id)
+
+
+def bl_search_user(query):
+    if query == None:
+        raise ValueError("Leere Suche")
+    
+    return search_user(query)
