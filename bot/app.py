@@ -18,7 +18,7 @@ from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.integration.aiohttp import CloudAdapter, ConfigurationBotFrameworkAuthentication
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots import CustomPromptBot
+from bots import UserPromptBot
 from config import DefaultConfig
 
 CONFIG = DefaultConfig()
@@ -68,7 +68,7 @@ USER_STATE = UserState(MEMORY)
 CONVERSATION_STATE = ConversationState(MEMORY)
 
 # Create Bot
-BOT = CustomPromptBot(CONVERSATION_STATE, USER_STATE)
+BOT = UserPromptBot(CONVERSATION_STATE, USER_STATE)
 
 
 # Listen for incoming requests on /api/messages.
