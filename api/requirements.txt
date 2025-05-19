@@ -1,9 +1,9 @@
-Flask==3.1.1
+Flask==3.0.3
 flask-sqlalchemy==3.1.1
 flask_cors==6.0.0
 pyodbc==5.2.0
 azure-identity==1.23.0
 azure-keyvault-secrets==4.9.0
-plotly
 reportlab
-pandas
+#plotly
+#pandas
