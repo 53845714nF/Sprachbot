@@ -59,3 +59,22 @@ def delete_user(user_id):
         db.session.commit()
         return True
     return False
+
+def search_user(query):
+    results = Person.query.filter(
+        db.or_(
+            Person.vorname.like(f'%{query}%'),
+            Person.nachname.like(f'%{query}%'),
+            Person.kontakt.has(db.or_(
+                db.column('email').like(f'%{query}%'),
+                db.column('telefonnummer').like(f'%{query}%')
+            )),
+            Person.adresse.has(db.or_(
+                db.column('strasse').like(f'%{query}%'),
+                db.column('ort').like(f'%{query}%'),
+                db.column('land').like(f'%{query}%'),
+                db.column('plz').like(f'%{query}%')
+            ))
+        )
+    ).all()
+    return results
