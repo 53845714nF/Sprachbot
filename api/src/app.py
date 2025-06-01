@@ -20,7 +20,7 @@ def create_app():
     """
     Create the API with Flask for Chatbot Database
     """
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
 
     cors = CORS(app)
     app.config['CORS_HEADERS'] = 'Content-Type'

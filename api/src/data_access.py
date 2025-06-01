@@ -1,3 +1,7 @@
+# Third-party modules
+from sqlalchemy import or_
+
+# Own modules
 from database import db
 from models import Person, Kontakt, Adresse
 
@@ -60,21 +64,33 @@ def delete_user(user_id):
         return True
     return False
 
-def search_user(query):
-    results = Person.query.filter(
-        db.or_(
-            Person.vorname.like(f'%{query}%'),
-            Person.nachname.like(f'%{query}%'),
-            Person.kontakt.has(db.or_(
-                db.column('email').like(f'%{query}%'),
-                db.column('telefonnummer').like(f'%{query}%')
-            )),
-            Person.adresse.has(db.or_(
-                db.column('strasse').like(f'%{query}%'),
-                db.column('ort').like(f'%{query}%'),
-                db.column('land').like(f'%{query}%'),
-                db.column('plz').like(f'%{query}%')
-            ))
-        )
-    ).all()
+def search_user(vorname=None, nachname=None, email=None, telefonnummer=None, strasse=None, ort=None, land=None, plz=None):
+    filters = []
+
+    if vorname:
+        filters.append(Person.vorname.ilike(f"%{vorname}%"))
+    if nachname:
+        filters.append(Person.nachname.ilike(f"%{nachname}%"))
+
+    if email or telefonnummer:
+        kontakt_filters = []
+        if email:
+            kontakt_filters.append(Kontakt.email.ilike(f"%{email}%"))
+        if telefonnummer:
+            kontakt_filters.append(Kontakt.telefonnummer.ilike(f"%{telefonnummer}%"))
+        filters.append(Person.kontakt.has(or_(*kontakt_filters)))
+
+    if strasse or ort or land or plz:
+        adresse_filters = []
+        if strasse:
+            adresse_filters.append(Adresse.strasse.ilike(f"%{strasse}%"))
+        if ort:
+            adresse_filters.append(Adresse.ort.ilike(f"%{ort}%"))
+        if land:
+            adresse_filters.append(Adresse.land.ilike(f"%{land}%"))
+        if plz:
+            adresse_filters.append(Adresse.plz.ilike(f"%{plz}%"))
+        filters.append(Person.adresse.has(or_(*adresse_filters)))
+
+    results = Person.query.filter(*filters).all()
     return results
