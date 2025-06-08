@@ -75,9 +75,14 @@ const UserCountChart: React.FC<UserCountChartProps> = ({ users }) => {
   }, [users]);
 
   return (
-    <div className="user-count-chart-container p-6 rounded-lg shadow-inner">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Nutzer pro Stadt</h2>
-      <div ref={chartRef} className="overflow-x-auto" />
+    <div className="overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-800">Nutzer pro Stadt</h2>
+        <p className="mt-1 text-sm text-gray-600">Zeigt die Anzahl der Nutzer pro Stadt an</p>
+      </div>
+      <div className="p-6">
+        <div ref={chartRef} className="overflow-x-auto" />
+      </div>
     </div>
   );
 };

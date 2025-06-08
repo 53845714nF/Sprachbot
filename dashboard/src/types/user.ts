@@ -29,3 +29,7 @@ export interface CreateUserI {
   ort: string;
   land: string;
 }
+
+export interface ApiError {
+  error: string;
+}

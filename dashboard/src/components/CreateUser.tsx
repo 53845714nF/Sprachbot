@@ -126,157 +126,153 @@ const CreateUser: React.FC<CreateUserProps> = ({ onUserCreated }) => {
   };
 
   return (
-    <div className="user-count-chart-container p-6 rounded-lg shadow-inner">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Neuen Benutzer erstellen</h2>
+    <div className="overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-800">Neuer Nutzer</h2>
+        <p className="mt-1 text-sm text-gray-600">Fügen Sie einen neuen Benutzer hinzu</p>
+      </div>
 
-      {status.message && (
-        <div className={`mb-4 p-3 rounded-md ${status.isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-          {status.message}
-        </div>
-      )}
+      <div className="p-6">
+        {status.message && (
+          <div className={`mb-6 p-4 rounded-md ${status.isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
+            {status.message}
+          </div>
+        )}
 
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="vorname" className="block text-sm font-medium text-gray-700 mb-1">Vorname</label>
+              <input
+                id="vorname"
+                name="vorname"
+                type="text"
+                value={formData.vorname}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="nachname" className="block text-sm font-medium text-gray-700 mb-1">Nachname</label>
+              <input
+                id="nachname"
+                name="nachname"
+                type="text"
+                value={formData.nachname}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
           <div>
-            <label htmlFor="vorname" className="block text-sm font-medium text-gray-700 mb-1">Vorname</label>
+            <label htmlFor="geburtsdatum" className="block text-sm font-medium text-gray-700 mb-1">Geburtsdatum</label>
             <input
-              id="vorname"
-              name="vorname"
-              type="text"
-              value={formData.vorname}
+              id="geburtsdatum"
+              name="geburtsdatum"
+              type="date"
+              value={formData.geburtsdatum}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div>
-            <label htmlFor="nachname" className="block text-sm font-medium text-gray-700 mb-1">Nachname</label>
-            <input
-              id="nachname"
-              name="nachname"
-              type="text"
-              value={formData.nachname}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="telefonnummer" className="block text-sm font-medium text-gray-700 mb-1">Telefonnummer</label>
+              <input
+                id="telefonnummer"
+                name="telefonnummer"
+                type="tel"
+                value={formData.telefonnummer}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="geburtsdatum" className="block text-sm font-medium text-gray-700 mb-1">Geburtsdatum</label>
-          <input
-            id="geburtsdatum"
-            name="geburtsdatum"
-            type="date"
-            value={formData.geburtsdatum}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <hr className="my-4 border-gray-200" />
-
-        <h3 className="text-lg font-semibold text-gray-700">Kontaktdaten</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">E-Mail</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="strasse" className="block text-sm font-medium text-gray-700 mb-1">Straße</label>
+              <input
+                id="strasse"
+                name="strasse"
+                type="text"
+                value={formData.strasse}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="hausnummer" className="block text-sm font-medium text-gray-700 mb-1">Hausnummer</label>
+              <input
+                id="hausnummer"
+                name="hausnummer"
+                type="text"
+                value={formData.hausnummer}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="telefonnummer" className="block text-sm font-medium text-gray-700 mb-1">Telefonnummer</label>
-            <input
-              id="telefonnummer"
-              name="telefonnummer"
-              type="tel"
-              value={formData.telefonnummer}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label htmlFor="plz" className="block text-sm font-medium text-gray-700 mb-1">PLZ</label>
+              <input
+                id="plz"
+                name="plz"
+                type="text"
+                value={formData.plz}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="ort" className="block text-sm font-medium text-gray-700 mb-1">Ort</label>
+              <input
+                id="ort"
+                name="ort"
+                type="text"
+                value={formData.ort}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="land" className="block text-sm font-medium text-gray-700 mb-1">Land</label>
+              <input
+                id="land"
+                name="land"
+                type="text"
+                value={formData.land}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
-        </div>
 
-        <hr className="my-4 border-gray-200" />
-
-        <h3 className="text-lg font-semibold text-gray-700">Adresse</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="strasse" className="block text-sm font-medium text-gray-700 mb-1">Straße</label>
-            <input
-              id="strasse"
-              name="strasse"
-              type="text"
-              value={formData.strasse}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={status.isLoading}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {status.isLoading ? 'Wird erstellt...' : 'Benutzer erstellen'}
+            </button>
           </div>
-          <div>
-            <label htmlFor="hausnummer" className="block text-sm font-medium text-gray-700 mb-1">Hausnummer</label>
-            <input
-              id="hausnummer"
-              name="hausnummer"
-              type="text"
-              value={formData.hausnummer}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="plz" className="block text-sm font-medium text-gray-700 mb-1">PLZ</label>
-            <input
-              id="plz"
-              name="plz"
-              type="text"
-              value={formData.plz}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="col-span-2">
-            <label htmlFor="ort" className="block text-sm font-medium text-gray-700 mb-1">Ort</label>
-            <input
-              id="ort"
-              name="ort"
-              type="text"
-              value={formData.ort}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="land" className="block text-sm font-medium text-gray-700 mb-1">Land</label>
-          <input
-            id="land"
-            name="land"
-            type="text"
-            value={formData.land}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <hr className="my-4 border-gray-200" />
-
-        <div className="pt-4">
-          <button
-            onClick={handleSubmit}
-            disabled={status.isLoading}
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {status.isLoading ? 'Wird verarbeitet...' : 'Benutzer erstellen'}
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );

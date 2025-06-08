@@ -41,14 +41,14 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ userId, onUserDeleted }) => {
     <div>
       <button
         onClick={handleDelete}
-        className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200 ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
         disabled={isDeleting}
       >
         {isDeleting ? 'Löschen...' : 'Löschen'}
       </button>
       
       {errorMessage && (
-        <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
+        <p className="mt-2 text-sm text-red-600">{errorMessage}</p>
       )}
     </div>
   );
