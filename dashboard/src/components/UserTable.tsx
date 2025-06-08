@@ -33,7 +33,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onUpdate: onDelete }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user, index) => (
+            {users.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">{user.vorname}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">{user.nachname}</td>
