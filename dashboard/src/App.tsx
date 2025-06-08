@@ -7,7 +7,6 @@ import SearchUser from './components/SearchUser';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
