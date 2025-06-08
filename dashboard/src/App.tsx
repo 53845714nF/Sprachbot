@@ -3,8 +3,10 @@ import UserTable from './components/UserTable';
 import UserCountChart from './components/UserCountChart';
 import CreateUser from './components/CreateUser';
 import { User } from './types/user';
+import SearchUser from './components/SearchUser';
 
 const apiUrl = import.meta.env.VITE_API_URL;
+
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
@@ -49,6 +51,7 @@ function App() {
     <div className="bg-white rounded-2xl shadow-xl p-8 w-full">
       <h1 className="text-3xl font-bold text-center text-indigo-700 mb-6">Admin Dashboard</h1>
       <div className="space-y-6">
+        <SearchUser />
         <UserCountChart users={users} />
         <UserTable users={users} onUpdate={handleUpdateUser}/>
         <CreateUser onUserCreated={handleUpdateUser}/>
