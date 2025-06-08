@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { User } from '../types/user';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const PdfStatistics: React.FC = () => {
   const [downloadLoading, setDownloadLoading] = useState<boolean>(false);
+  const [jsonLoading, setJsonLoading] = useState<boolean>(false);
   const [viewLoading, setViewLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
@@ -89,6 +91,48 @@ const PdfStatistics: React.FC = () => {
     }
   };
 
+
+  const handleDownloadJson = async (): Promise<void> => {
+    setJsonLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await fetch(`${apiUrl}/api/users`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const users: User[] = await response.json();
+      
+      // Convert to JSON string with pretty formatting
+      const jsonString = JSON.stringify(users, null, 2);
+      
+      // Create blob and download
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      link.download = `personen_export_${timestamp}.json`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setSuccess(`JSON-Export erfolgreich heruntergeladen! (${users.length} Personen)`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      setError(`Fehler beim JSON-Export: ${errorMessage}`);
+    } finally {
+      setJsonLoading(false);
+    }
+  };
+
   const clearMessages = (): void => {
     setError('');
     setSuccess('');
@@ -97,11 +141,8 @@ const PdfStatistics: React.FC = () => {
   return (
     <>
       <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">Personenstatistiken PDF</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Erstellen Sie eine detaillierte PDF mit allen Personenstatistiken. 
-            Sie können die PDF herunterladen oder direkt im Browser anzeigen.
-          </p>
+          <h2 className="text-lg font-semibold text-gray-800">Datenexport & Statistiken</h2>
+          <p className="mt-1 text-sm text-gray-600">Erstellen Sie detaillierte PDF-Statistiken oder exportieren Sie alle Personendaten als JSON-Datei für weitere Analysen.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row mb-6 mt-6 px-6 space-y-4 sm:space-y-0 sm:space-x-4">
@@ -119,6 +160,14 @@ const PdfStatistics: React.FC = () => {
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-6 py-3 rounded-md transition-colors duration-200 min-w-48"
           >
             {viewLoading ? 'Wird geöffnet...' : 'PDF Anzeigen'}
+          </button>
+
+          <button
+            onClick={handleDownloadJson}
+            disabled={downloadLoading || viewLoading || jsonLoading}
+            className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white px-6 py-3 rounded-md transition-colors duration-200 min-w-48"
+          >
+            {jsonLoading ? 'Wird exportiert...' : 'JSON Exportieren'}
           </button>
         </div>
 
@@ -159,8 +208,9 @@ const PdfStatistics: React.FC = () => {
         <div className="bg-gray-50 rounded-lg p-4 mt-6">
           <h3 className="font-medium text-gray-900 mb-2">Hinweise:</h3>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>• <strong>Herunterladen:</strong> Lädt die PDF-Datei direkt auf Ihr Gerät herunter</li>
-            <li>• <strong>Anzeigen:</strong> Öffnet die PDF in einem neuen Browser-Tab zur sofortigen Ansicht</li>
+            <li>• <strong>PDF Herunterladen:</strong> Lädt die PDF-Datei direkt auf Ihr Gerät herunter</li>
+            <li>• <strong>PDFAnzeigen:</strong> Öffnet die PDF in einem neuen Browser-Tab zur sofortigen Ansicht</li>
+            <li>• <strong>JSON Export:</strong> Exportiert alle Personendaten als JSON-Datei für weitere Analysen</li>
             <li>• Die PDF enthält aktuelle Statistiken basierend auf den vorhandenen Personendaten</li>
             <li>• Bei Problemen stellen Sie sicher, dass Pop-ups für diese Seite erlaubt sind</li>
           </ul>
