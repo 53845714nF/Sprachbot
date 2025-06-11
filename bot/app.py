@@ -4,29 +4,35 @@
 from sys import stderr
 from traceback import print_exc
 from datetime import datetime
+import asyncio
 
-from aiohttp import web
-from aiohttp.web import Request, Response
+from flask import Flask, request, Response
 from botbuilder.core import (
     ConversationState,
+    BotFrameworkAdapterSettings,
     MemoryStorage,
     TurnContext,
     UserState,
+    BotFrameworkAdapter,
 )
-from botbuilder.core.integration import aiohttp_error_middleware
-from botbuilder.integration.aiohttp import CloudAdapter, ConfigurationBotFrameworkAuthentication
 from botbuilder.schema import Activity, ActivityTypes
 
 from bots import UserPromptBot
 from config import DefaultConfig
 
-CONFIG = DefaultConfig()
+config = DefaultConfig()
 
-# Create adapter.
-# See https://aka.ms/about-bot-adapter to learn more about how bots work.
-ADAPTER = CloudAdapter(ConfigurationBotFrameworkAuthentication(CONFIG))
+app = Flask(__name__)
+adapter_settings = BotFrameworkAdapterSettings(app_id=config.APP_ID, app_password=config.APP_PASSWORD)
+adapter = BotFrameworkAdapter(adapter_settings)
 
-# Catch-all for errors.
+storage = MemoryStorage()
+conversation_state = ConversationState(storage)
+user_state = UserState(storage)
+
+bot = UserPromptBot(conversation_state, user_state)
+
+
 async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
@@ -54,36 +60,43 @@ async def on_error(context: TurnContext, error: Exception):
         await context.send_activity(trace_activity)
 
     # Clear out state
-    await CONVERSATION_STATE.delete(context)
-
+    await conversation_state.delete(context)
 
 # Set the error handler on the Adapter.
-# In this case, we want an unbound method, so MethodType is not needed.
-ADAPTER.on_turn_error = on_error
-
-# Create MemoryStorage and state
-MEMORY = MemoryStorage()
-USER_STATE = UserState(MEMORY)
-CONVERSATION_STATE = ConversationState(MEMORY)
-
-# Create Bot
-BOT = UserPromptBot(CONVERSATION_STATE, USER_STATE)
+adapter.on_turn_error = on_error
 
 
-# Listen for incoming requests on /api/messages.
-async def messages(req: Request) -> Response:
-    return await ADAPTER.process(req, BOT)
+@app.route("/", methods=["GET"])
+def home():
+    return "Hello, World!"
 
+@app.route("/api/messages", methods=["POST"])
+def messages():
+    if "application/json" in request.headers["Content-Type"]:
+        body = request.json
+    else:
+        return Response(status=415)
 
-APP = web.Application(middlewares=[aiohttp_error_middleware])
-APP.router.add_post("/api/messages", messages)
+    activity = Activity().deserialize(body)
+    auth_header = request.headers["Authorization"] if "Authorization" in request.headers else ""
 
-# Add a route for the root URL
-APP.router.add_get("/", lambda req: web.Response(text="Hello, World!")) 
-
+    try:
+        # Erstelle einen Event Loop für die asynchrone Ausführung
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        # Führe die asynchrone Funktion aus
+        response = loop.run_until_complete(
+            adapter.process_activity(activity, auth_header, bot.on_turn)
+        )
+        
+        if response:
+            return response
+        return Response(status=201)
+    except Exception as e:
+        return Response(str(e), status=500)
+    finally:
+        loop.close()
 
 if __name__ == "__main__":
-    try:
-        web.run_app(APP, host=CONFIG.HOST, port=CONFIG.PORT)
-    except Exception as error:
-        raise error
+    app.run(host=config.HOST, port=int(config.PORT))

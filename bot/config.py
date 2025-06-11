@@ -10,7 +10,7 @@ from os import getenv
 class DefaultConfig:
     """ Bot Configuration """
     HOST = getenv("HOST", "0.0.0.0")
-    PORT = getenv("PORT", 8000)
+    PORT = getenv("PORT", "8000")
     APP_ID = getenv("MicrosoftAppId", "")
     APP_PASSWORD = getenv("MicrosoftAppPassword", "")
     APP_TYPE = getenv("MicrosoftAppType", "MultiTenant")
