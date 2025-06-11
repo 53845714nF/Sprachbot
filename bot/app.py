@@ -78,6 +78,10 @@ async def messages(req: Request) -> Response:
 APP = web.Application(middlewares=[aiohttp_error_middleware])
 APP.router.add_post("/api/messages", messages)
 
+# Add a route for the root URL
+APP.router.add_get("/", lambda req: web.Response(text="Hello, World!")) 
+
+
 if __name__ == "__main__":
     try:
         web.run_app(APP, host=CONFIG.HOST, port=CONFIG.PORT)
