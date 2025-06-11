@@ -2,16 +2,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import os
+from os import getenv
 
 """ Bot Configuration """
 
 
 class DefaultConfig:
     """ Bot Configuration """
-
-    PORT = 3978
-    APP_ID = os.environ.get("MicrosoftAppId", "")
-    APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
-    APP_TYPE = os.environ.get("MicrosoftAppType", "MultiTenant")
-    APP_TENANTID = os.environ.get("MicrosoftAppTenantId", "")
+    HOST = getenv("HOST", "0.0.0.0")
+    PORT = getenv("PORT", 8000)
+    APP_ID = getenv("MicrosoftAppId", "")
+    APP_PASSWORD = getenv("MicrosoftAppPassword", "")
+    APP_TYPE = getenv("MicrosoftAppType", "MultiTenant")
+    APP_TENANTID = getenv("MicrosoftAppTenantId", "")
