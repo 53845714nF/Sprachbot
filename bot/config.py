@@ -15,3 +15,4 @@ class DefaultConfig:
     APP_PASSWORD = getenv("MicrosoftAppPassword", "")
     APP_TYPE = getenv("MicrosoftAppType", "MultiTenant")
     APP_TENANTID = getenv("MicrosoftAppTenantId", "")
+    API_URL = getenv("API_URL", "https://chatbot-api-eshfewc7e3agbhbt.centralus-01.azurewebsites.net")

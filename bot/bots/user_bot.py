@@ -15,7 +15,7 @@ from botbuilder.core import (
 )
 
 from data_models import ConversationFlow, Question, UserProfile
-
+from .create_user import create_user
 
 class ValidationResult:
     def __init__(
@@ -120,10 +120,17 @@ class UserPromptBot(ActivityHandler):
                     )
                 )
                 flow.last_question_asked = Question.EMAIL
+
+                # Konvertiere das Datum in YYYY-MM-DD Format
+                try:
+                    date_obj = datetime.strptime(profile.date_of_birth, '%d.%m.%Y')
+                    profile.date_of_birth = date_obj.strftime('%Y-%m-%d')
+                except ValueError:
+                    print("Fehler bei der Datumsumwandlung")
         
         # validate email date then ask for TELEPHONE_NUMBER
         elif flow.last_question_asked == Question.EMAIL:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_email(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -140,7 +147,7 @@ class UserPromptBot(ActivityHandler):
 
         # validate tele then ask for street
         elif flow.last_question_asked == Question.TELEPHONE_NUMBER:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_tel(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -157,7 +164,7 @@ class UserPromptBot(ActivityHandler):
 
         # validate stree then ask for house number
         elif flow.last_question_asked == Question.STREET:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_street(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -174,7 +181,7 @@ class UserPromptBot(ActivityHandler):
         
         # validate housenumber then ask for postal code
         elif flow.last_question_asked == Question.HOUSE_NUMBER:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_house_number(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -191,7 +198,7 @@ class UserPromptBot(ActivityHandler):
 
         # validate postal_code then ask for city
         elif flow.last_question_asked == Question.POSTAL_CODE:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_postal_code(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -208,7 +215,7 @@ class UserPromptBot(ActivityHandler):
 
         # validate city then ask for country
         elif flow.last_question_asked == Question.CITY:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_city(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -225,7 +232,7 @@ class UserPromptBot(ActivityHandler):
         
         # validate country then ask for noting
         elif flow.last_question_asked == Question.COUNTRY:
-            validate_result = self._validate_name(user_input)
+            validate_result = self._validate_country(user_input)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -235,8 +242,19 @@ class UserPromptBot(ActivityHandler):
                 await turn_context.send_activity(
                     MessageFactory.text(f"Sie leben im Land {profile.country}.")
                 )
+                create_user(profile.first_name,
+                        profile.last_name,
+                        profile.date_of_birth,
+                        profile.email,
+                        profile.telephone_number,
+                        profile.street,
+                        profile.house_number,
+                        profile.postal_code,
+                        profile.city,
+                        profile.country)
+                
                 await turn_context.send_activity(
-                    MessageFactory.text(f"Das war's!")
+                    MessageFactory.text(f"Der Nutzer wurde erfolgreich erstellt. Das war's!")
                 )
                 flow.last_question_asked = Question.NONE
 
@@ -250,8 +268,6 @@ class UserPromptBot(ActivityHandler):
         return ValidationResult(is_valid=True, value=user_input)
 
     def _validate_age(self, user_input: str) -> ValidationResult:
-        # Attempt to convert the Recognizer result to an integer. This works for "a dozen", "twelve", "12", and so on.
-        # The recognizer returns a list of potential recognition results, if any.
         results = recognize_number(user_input, Culture.English)
         for result in results:
             if "value" in result.resolution:
@@ -263,42 +279,158 @@ class UserPromptBot(ActivityHandler):
             is_valid=False, message="Bitte geben Sie ein Alter zwischen 18 und 120 Jahren an."
         )
 
-    def _validate_date(self, user_input: str) -> ValidationResult:
-        try:
-            # Try to recognize the input as a date-time. This works for responses such as "11/14/2018", "9pm",
-            # "tomorrow", "Sunday at 5pm", and so on. The recognizer returns a list of potential recognition results,
-            # if any.
-            results = recognize_datetime(user_input, Culture.English)
-            for result in results:
-                for resolution in result.resolution["values"]:
-                    if "value" in resolution:
-                        now = datetime.now()
-
-                        value = resolution["value"]
-                        if resolution["type"] == "date":
-                            candidate = datetime.strptime(value, "%Y-%m-%d")
-                        elif resolution["type"] == "time":
-                            candidate = datetime.strptime(value, "%H:%M:%S")
-                            candidate = candidate.replace(
-                                year=now.year, month=now.month, day=now.day
-                            )
-                        else:
-                            candidate = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
-
-                        # user response must be more than an hour out
-                        diff = candidate - now
-                        if diff.total_seconds() >= 3600:
-                            return ValidationResult(
-                                is_valid=True,
-                                value=candidate.strftime("%m/%d/%y"),
-                            )
-
+    def _validate_email(self, user_input: str) -> ValidationResult:
+        if not user_input:
             return ValidationResult(
                 is_valid=False,
-                message="Es tut mir leid, ich konnte das nicht als geeignetes Datum interpretieren.",
+                message="Bitte geben Sie eine E-Mail-Adresse ein.",
             )
+        
+        if '@' not in user_input or '.' not in user_input[user_input.find('@'):]:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie eine gültige E-Mail-Adresse ein (muss @ und einen Punkt nach dem @ enthalten).",
+            )
+            
+        return ValidationResult(is_valid=True, value=user_input)
+
+    def _validate_date(self, user_input: str) -> ValidationResult:
+        try:
+            # Versuche das Datum im Format DD.MM.YYYY zu parsen
+            date_parts = user_input.split('.')
+            if len(date_parts) != 3:
+                return ValidationResult(
+                    is_valid=False,
+                    message="Bitte geben Sie das Datum im Format TT.MM.JJJJ ein (z.B. 19.02.2001)"
+                )
+            
+            day = int(date_parts[0])
+            month = int(date_parts[1])
+            year = int(date_parts[2])
+            
+            # Überprüfe die Gültigkeit des Datums
+            if not (1 <= day <= 31 and 1 <= month <= 12 and 1900 <= year <= 2100):
+                return ValidationResult(
+                    is_valid=False,
+                    message="Bitte geben Sie ein gültiges Datum ein (z.B. 19.02.2001)"
+                )
+            
+            # Formatiere das Datum zurück in das gewünschte Format
+            formatted_date = f"{day:02d}.{month:02d}.{year}"
+            return ValidationResult(is_valid=True, value=formatted_date)
+            
         except ValueError:
             return ValidationResult(
                 is_valid=False,
-                message="Es tut mir leid, ich konnte das nicht als geeignetes Datum interpretieren.",
+                message="Bitte geben Sie das Datum im Format TT.MM.JJJJ ein (z.B. 19.02.2001)"
             )
+
+    def _validate_tel(self, user_input: str) -> ValidationResult:
+        if not user_input:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie eine Telefonnummer ein.",
+            )
+        
+        # Entferne Leerzeichen für die Validierung
+        tel = user_input.replace(" ", "")
+        
+        # Prüfe ob die Nummer mit + beginnt
+        if tel.startswith('+'):
+            tel = tel[1:]
+        
+        # Prüfe ob nur Zahlen enthalten sind
+        if not tel.isdigit():
+            return ValidationResult(
+                is_valid=False,
+                message="Die Telefonnummer darf nur Zahlen und optional ein + am Anfang enthalten.",
+            )
+        
+        # Prüfe die Länge (internationale Nummern haben zwischen 7 und 15 Ziffern)
+        if len(tel) < 7 or len(tel) > 15:
+            return ValidationResult(
+                is_valid=False,
+                message="Die Telefonnummer muss zwischen 7 und 15 Ziffern lang sein.",
+            )
+            
+        return ValidationResult(is_valid=True, value=user_input)
+
+    def _validate_street(self, user_input: str) -> ValidationResult:
+        if not user_input:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie eine Straße ein.",
+            )
+        
+        # Es gibt Straßen mit 1 Zeichen, darum nicht die Länge prüfen
+        return ValidationResult(is_valid=True, value=user_input)
+
+    def _validate_house_number(self, user_input: str) -> ValidationResult:
+        if not user_input:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie eine Hausnummer ein.",
+            )
+        
+        number = user_input.replace(" ", "")
+        
+        # Prüfe ob die Hausnummer mit einer Zahl beginnt
+        # Es gibt Hausnummern mit Buchstaben wie 2a
+        if not number[0].isdigit():
+            return ValidationResult(
+                is_valid=False,
+                message="Die Hausnummer muss mit einer Zahl beginnen.",
+            )
+            
+        return ValidationResult(is_valid=True, value=user_input)
+
+    def _validate_postal_code(self, user_input: str) -> ValidationResult:
+        if not user_input:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie eine Postleitzahl ein.",
+            )
+        
+        postal_code = user_input.replace(" ", "")
+        
+        # Prüfe ob die Postleitzahl nur aus Zahlen besteht
+        if not postal_code.isdigit():
+            return ValidationResult(
+                is_valid=False,
+                message="Die Postleitzahl darf nur aus Zahlen bestehen.",
+            )
+        
+        # Prüfe ob die Postleitzahl 5 Ziffern hat
+        if len(postal_code) != 5:
+            return ValidationResult(
+                is_valid=False,
+                message="Die Postleitzahl muss genau 5 Ziffern lang sein.",
+            )
+            
+        return ValidationResult(is_valid=True, value=user_input)
+
+    def _validate_city(self, user_input: str) -> ValidationResult:
+        if not user_input:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie eine Stadt ein.",
+            )
+        # Es gibt Städte mit 1 Zeichen, darum nicht die Länge prüfen        
+        return ValidationResult(is_valid=True, value=user_input)
+
+    def _validate_country(self, user_input: str) -> ValidationResult:
+        if not user_input:
+            return ValidationResult(
+                is_valid=False,
+                message="Bitte geben Sie ein Land ein.",
+            )
+        
+        # Chad, Peru, Mali, Iran haben 4 Zeichen 
+        # Prüfe ob das Land mindestens 4 Zeichen lang ist
+        if len(user_input) < 4:
+            return ValidationResult(
+                is_valid=False,
+                message="Der Ländername muss mindestens 4 Zeichen lang sein.",
+            )
+            
+        return ValidationResult(is_valid=True, value=user_input)
