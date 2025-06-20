@@ -4,7 +4,6 @@
 from datetime import datetime
 
 from recognizers_number import recognize_number, Culture
-from recognizers_date_time import recognize_datetime
 
 from botbuilder.core import (
     ActivityHandler,
@@ -14,8 +13,10 @@ from botbuilder.core import (
     MessageFactory,
 )
 
+# Own modules
 from data_models import ConversationFlow, Question, UserProfile
 from .create_user import create_user
+from .lang import analyze_query
 
 class ValidationResult:
     def __init__(
@@ -68,7 +69,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate first name then ask for lastname
         elif flow.last_question_asked == Question.FIRST_NAME:
-            validate_result = self._validate_name(user_input)
+            ml_result = analyze_query(user_input, "vorname_entity")
+            validate_result = self._validate_name(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -85,7 +87,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate last name then ask for birth date
         elif flow.last_question_asked == Question.LAST_NAME:
-            validate_result = self._validate_name(user_input)
+            ml_result = analyze_query(f"{user_input} (Nachname)", "nachname_entity")
+            validate_result = self._validate_name(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -102,7 +105,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate birth date then ask for email
         elif flow.last_question_asked == Question.DATE_OF_BIRTH:
-            validate_result = self._validate_date(user_input)
+            ml_result = analyze_query(user_input, "geburtstag_entity")
+            validate_result = self._validate_date(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -130,7 +134,8 @@ class UserPromptBot(ActivityHandler):
         
         # validate email date then ask for TELEPHONE_NUMBER
         elif flow.last_question_asked == Question.EMAIL:
-            validate_result = self._validate_email(user_input)
+            ml_result = analyze_query(user_input, "e-mail_entity")
+            validate_result = self._validate_email(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -147,7 +152,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate tele then ask for street
         elif flow.last_question_asked == Question.TELEPHONE_NUMBER:
-            validate_result = self._validate_tel(user_input)
+            ml_result = analyze_query(user_input, "telefonnummer_entity")
+            validate_result = self._validate_tel(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -164,7 +170,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate stree then ask for house number
         elif flow.last_question_asked == Question.STREET:
-            validate_result = self._validate_street(user_input)
+            ml_result = analyze_query(f"{user_input} (Straße)", "straße_entity")
+            validate_result = self._validate_street(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -181,7 +188,8 @@ class UserPromptBot(ActivityHandler):
         
         # validate housenumber then ask for postal code
         elif flow.last_question_asked == Question.HOUSE_NUMBER:
-            validate_result = self._validate_house_number(user_input)
+            ml_result = analyze_query(user_input, "hausnummer_entity")
+            validate_result = self._validate_house_number(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -198,7 +206,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate postal_code then ask for city
         elif flow.last_question_asked == Question.POSTAL_CODE:
-            validate_result = self._validate_postal_code(user_input)
+            ml_result = analyze_query(user_input, "plz_entity")
+            validate_result = self._validate_postal_code(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -215,7 +224,8 @@ class UserPromptBot(ActivityHandler):
 
         # validate city then ask for country
         elif flow.last_question_asked == Question.CITY:
-            validate_result = self._validate_city(user_input)
+            ml_result = analyze_query(user_input, "ort_entity")
+            validate_result = self._validate_city(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
@@ -232,7 +242,8 @@ class UserPromptBot(ActivityHandler):
         
         # validate country then ask for noting
         elif flow.last_question_asked == Question.COUNTRY:
-            validate_result = self._validate_country(user_input)
+            ml_result = analyze_query(user_input, "land_entity")
+            validate_result = self._validate_country(ml_result)
             if not validate_result.is_valid:
                 await turn_context.send_activity(
                     MessageFactory.text(validate_result.message)
