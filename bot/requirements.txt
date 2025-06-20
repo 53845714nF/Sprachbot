@@ -1,12 +1,9 @@
-gunicorn==23.0.0
 botbuilder-core>=4.15.0
 recognizers-text>=1.0.2a1
-recognizers_date_time
 recognizers_number
 flask>=2.0.0
 aiohttp>=3.8.0
 asgiref>=3.7.0
-emoji
 botbuilder-schema
 botframework-connector
 botbuilder-dialogs
