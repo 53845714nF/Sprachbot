@@ -58,3 +58,10 @@ The user must also be given the `Key Vault Data Access Administrator` role in th
 
 ## Azure Language Service
 The Azure Language Service is used to analyze the user's query and to extract the entities. The Model is trained with extra data for the entities.
+
+## web-chat
+The web-chat website needs a `secrets.js` in which the variable `botToken` must be set. This is the token for the Azure Bot Service.
+
+## voice-chat
+The voice-chat website needs a `secrets.js` in which the variable botToken must be set.
+This is the token for the Azure Bot Service. And the variable speechKey this is for the Azure speech recognition service.

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Voice Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6">
+        
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-800">🎤 Voice zu Bot</h2>
+            <p class="text-gray-500 mt-2">Sprechen Sie mit dem Bot über Ihr Mikrofon</p>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+            <div class="flex items-center justify-between space-x-3">
+                <button id="startBtn" class="flex-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    🎙️ Aufnahme starten
+                </button>
+                <button id="stopBtn" disabled class="flex-1 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed">
+                    ⏹️ Aufnahme stoppen
+                </button>
+            </div>
+            <button id="muteBtn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-75 transition-colors">
+                🔊 Stumm schalten
+            </button>
+            
+            <div class="h-12 flex items-center justify-center bg-gray-200 rounded-lg">
+                <p id="output" class="text-gray-700 font-medium text-center px-4">Noch nichts erkannt...</p>
+            </div>
+        </div>
+        
+        <div id="webchat" class="w-full h-96 rounded-lg shadow-inner border border-gray-200"></div>
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+    <script src="secrets.js"></script>
+    <script src="script.js"></script>
+    
+</body>
+</html>

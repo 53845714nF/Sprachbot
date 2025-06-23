@@ -80,3 +80,4 @@ dmypy.json
 .ruff_cache/
 
 create_user.sh
+secrets.js
